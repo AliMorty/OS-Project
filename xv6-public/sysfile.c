@@ -466,10 +466,3 @@ sys_pipe(void)
     return 0;
 }
 
-///////MINE!/////////
-int
-sys_enzo(void)
-{
-    cprintf("UNBELIEVABLE!\n");
-    return 0;
-}

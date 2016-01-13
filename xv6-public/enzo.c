@@ -3,11 +3,9 @@
 //
 
 #include "user.h"
-//#include "defs.h"
 
 int main()
 {
-//    cprintf("ok!\n");
     enzo();
     return 0;
 }
