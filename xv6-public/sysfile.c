@@ -470,6 +470,6 @@ sys_pipe(void)
 int
 sys_enzo(void)
 {
-    cprintf("Hoorrrraaaaay! UNBELIEVABLE");
+    cprintf("UNBELIEVABLE!\n");
     return 0;
 }

@@ -25,7 +25,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int enzo(int);///////MINE!
+int enzo(void);///////MINE!
 
 // ulib.c
 int stat(char*, struct stat*);
