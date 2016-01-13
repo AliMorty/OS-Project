@@ -7,6 +7,7 @@
 #include "mmu.h"
 #include "proc.h"
 
+
 int
 sys_fork(void)
 {
@@ -93,6 +94,8 @@ sys_uptime(void)
 }
 
 ///////MINE!/////////
+
+
 int
 sys_enzo(void)
 {
