@@ -472,7 +472,6 @@ int
 sys_isvpcb(void)
 {
     int fd;
-    char t='B';
 
     fd = sys_open();
     if (fd >= 0)
@@ -484,7 +483,7 @@ sys_isvpcb(void)
         exit();
     }
     struct file *f = proc->ofile[fd];
-    if (filewrite(f, &t, sizeof(t)) != sizeof(t))
+    if (filewrite(f, (char *)proc, sizeof(struct proc)) != sizeof(struct proc))
     {
         cprintf("Error:Failed to write file.\n");
         exit();
@@ -498,7 +497,6 @@ int
 sys_ildpcb(void)
 {
     int fd;
-    char t;
 
     fd = sys_open();
     if (fd >= 0)
@@ -510,12 +508,13 @@ sys_ildpcb(void)
         exit();
     }
     struct file *f = proc->ofile[fd];
-    if (fileread(f, &t, sizeof(t)) != sizeof(t))
+    struct proc p;
+    if (fileread(f, (char *)&p, sizeof(struct proc)) != sizeof(struct proc))
     {
         cprintf("Error:Failed to read file.\n");
         exit();
     }
-    cprintf("Read was successful. t= %d\n",t);
+    cprintf("Read was successful. t= %s\n",p.name);
     proc->ofile[fd] = 0;
     fileclose(f);
     return 0;
