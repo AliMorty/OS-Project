@@ -467,3 +467,32 @@ sys_pipe(void)
     return 0;
 }
 
+///////MINE!/////////
+
+
+int
+sys_isvpcb(void)
+{
+    int fd;
+    char t='B';
+
+    fd = sys_open();
+    if (fd >= 0)
+    {
+        cprintf("Create file succeeded\n");
+    } else
+    {
+        cprintf("Error:Failed to create file.\n");
+        exit();
+    }
+    struct file *f = proc->ofile[fd];
+    if (filewrite(f, &t, sizeof(t)) != sizeof(t))
+    {
+        cprintf("Error:Failed to  write to file.\n");
+        exit();
+    }
+    cprintf("Write was successful.\n");
+    proc->ofile[fd] = 0;
+    fileclose(f);
+    return 0;
+}

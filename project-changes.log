@@ -1,6 +1,6 @@
 syscall.h
 syscall.c
-sysproc.c
+sysfile.c
 user.h
 usys.S
 enzo.c

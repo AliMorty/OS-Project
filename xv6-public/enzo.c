@@ -3,9 +3,10 @@
 //
 
 #include "user.h"
+#include "fcntl.h"
 
 int main()
 {
-    isvpcb();
+    isvpcb("tmp",O_CREATE|O_RDWR);
     return 0;
 }

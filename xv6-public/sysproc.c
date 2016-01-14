@@ -8,6 +8,7 @@
 #include "proc.h"
 
 
+
 int
 sys_fork(void)
 {
@@ -93,10 +94,3 @@ sys_uptime(void)
     return xticks;
 }
 
-///////MINE!/////////
-int
-sys_isvpcb(void)
-{
-    cprintf("SURPRISE!\n");
-    return 0;
-}
