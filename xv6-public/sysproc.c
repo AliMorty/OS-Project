@@ -94,8 +94,6 @@ sys_uptime(void)
 }
 
 ///////MINE!/////////
-
-
 int
 sys_enzo(void)
 {
