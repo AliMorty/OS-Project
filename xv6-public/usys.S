@@ -29,4 +29,4 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
-SYSCALL(enzo)///////MINE!
+SYSCALL(isvpcb)///////MINE!

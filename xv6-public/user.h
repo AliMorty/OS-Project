@@ -46,7 +46,7 @@ int sleep(int);
 
 int uptime(void);
 
-int enzo(void);///////MINE!
+int isvpcb(void);///////MINE!
 
 // ulib.c
 int stat(char *, struct stat *);

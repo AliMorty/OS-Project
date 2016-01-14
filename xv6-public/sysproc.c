@@ -95,7 +95,7 @@ sys_uptime(void)
 
 ///////MINE!/////////
 int
-sys_enzo(void)
+sys_isvpcb(void)
 {
     cprintf("SURPRISE!\n");
     return 0;
