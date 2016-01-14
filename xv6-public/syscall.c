@@ -121,6 +121,8 @@ extern int sys_uptime(void);
 
 extern int sys_isvpcb(void);//////MINE!
 
+extern int sys_ildpcb(void);//////MINE!
+
 static int (*syscalls[])(void) = {
         [SYS_fork]    sys_fork,
         [SYS_exit]    sys_exit,
@@ -144,6 +146,7 @@ static int (*syscalls[])(void) = {
         [SYS_mkdir]   sys_mkdir,
         [SYS_close]   sys_close,
         [SYS_isvpcb]  sys_isvpcb,///////////MINE!
+        [SYS_ildpcb]  sys_ildpcb,///////////MINE!
 };
 
 void

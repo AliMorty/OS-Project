@@ -468,8 +468,6 @@ sys_pipe(void)
 }
 
 ///////MINE!/////////
-
-
 int
 sys_isvpcb(void)
 {
@@ -488,7 +486,7 @@ sys_isvpcb(void)
     struct file *f = proc->ofile[fd];
     if (filewrite(f, &t, sizeof(t)) != sizeof(t))
     {
-        cprintf("Error:Failed to  write to file.\n");
+        cprintf("Error:Failed to write file.\n");
         exit();
     }
     cprintf("Write was successful.\n");
@@ -496,3 +494,30 @@ sys_isvpcb(void)
     fileclose(f);
     return 0;
 }
+int
+sys_ildpcb(void)
+{
+    int fd;
+    char t;
+
+    fd = sys_open();
+    if (fd >= 0)
+    {
+        cprintf("Open file succeeded\n");
+    } else
+    {
+        cprintf("Error:Failed to open file.\n");
+        exit();
+    }
+    struct file *f = proc->ofile[fd];
+    if (fileread(f, &t, sizeof(t)) != sizeof(t))
+    {
+        cprintf("Error:Failed to read file.\n");
+        exit();
+    }
+    cprintf("Read was successful. t= %d\n",t);
+    proc->ofile[fd] = 0;
+    fileclose(f);
+    return 0;
+}
+
