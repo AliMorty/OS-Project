@@ -505,7 +505,7 @@ void get_proc(int pid, struct proc **child_proc)
     release(&ptable.lock);
 }
 
-void
+int
 load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file)
 {
     int i, pid;
@@ -513,7 +513,7 @@ load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file)
 
     // Allocate process.
     if ((np = allocproc()) == 0)
-        return;
+        return 0;
 
     *(np->context)=*(p->context);
     np->context->eip = (uint) forkret;
@@ -528,15 +528,14 @@ load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file)
     }
     np->sz = p->sz;
     np->parent = proc;
-    *np->tf = *p->tf;
 
     // Clear %eax so that fork returns 0 in the child.
     np->tf->eax = 0;
 
     for (i = 0; i < NOFILE; i++)
         if (p->ofile[i])
-            np->ofile[i] = filedup(proc->ofile[i]);
-    np->cwd = idup(p->cwd);
+            np->ofile[i] = filedup(p->ofile[i]);
+    np->cwd = namei("enzo");
 
     safestrcpy(np->name, p->name, sizeof(p->name));
 
@@ -547,4 +546,5 @@ load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file)
     np->state = RUNNABLE;
     release(&ptable.lock);
 
+    return pid;
 }

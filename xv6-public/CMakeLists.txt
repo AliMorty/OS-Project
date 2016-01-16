@@ -104,7 +104,7 @@ set(SOURCE_FILES
     zombie.c)
 set(PROJECT_BINARY_DIR /home/danial/Desktop/OS/xv6_clone/xv6-public)
 
-add_executable(xv6_public ${SOURCE_FILES} enzo.c the_sample_process.h the_sample_process.c morty.h morty.c morty.h morty.c)
+add_executable(xv6_public ${SOURCE_FILES} enzo.c morty.c)
 
 #add_custom_target(xv6_public COMMAND make -C ${xv6_public_SOURCE_DIR}
 #        CLION_EXE_DIR=${PROJECT_BINARY_DIR})

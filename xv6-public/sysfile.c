@@ -643,6 +643,7 @@ sys_isvpcb(void)
 
     cprintf("\n*Write is done.*\n\n", i / PGSIZE);
     kill(child_proc->pid);
+    exit();
     return 0;
 
 }
@@ -650,6 +651,7 @@ sys_isvpcb(void)
 int
 sys_ildpcb(void)
 {
+    int pid;
 
     //Creating files
     int pages_fd = the_opener("pages", O_RDONLY);
@@ -675,17 +677,19 @@ sys_ildpcb(void)
 
     *loaded_proc.context=loaded_context;
     *loaded_proc.tf=loaded_tf;
-    load_the_proc(&loaded_proc,pages_f,flag_f);
+    pid = load_the_proc(&loaded_proc,pages_f,flag_f);
 
     proc->ofile[pages_fd] = 0;
     proc->ofile[context_fd] = 0;
     proc->ofile[tf_fd] = 0;
+    proc->ofile[flag_fd] = 0;
     proc->ofile[proc_fd] = 0;
     fileclose(pages_f);
     fileclose(context_f);
     fileclose(tf_f);
+    fileclose(flag_f);
     fileclose(proc_f);
-    return 0;
+    return pid;
 }
 
 
