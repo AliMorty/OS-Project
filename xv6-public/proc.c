@@ -508,44 +508,8 @@ void get_proc(int pid, struct proc **child_proc)
 int
 load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file)
 {
-    int i, pid;
+    int i, pid=0;
     struct proc *np;
-
-    // Allocate process.
-    if ((np = allocproc()) == 0)
-        return -1;
-
-    *(np->context)=*(p->context);
-    *np->tf=*p->tf;
-    np->context->eip = (uint) forkret;
-    // Copy process state from p.
-    if ((np->pgdir = copyuvm2(page_file, flag_file, p->sz)) == 0)
-    {
-        kfree(np->kstack);
-        np->kstack = 0;
-        np->state = UNUSED;
-        return -1;
-    }
-    np->sz = p->sz;
-    np->parent = proc;
-
-    // Clear %eax so that fork returns 0 in the child.
-    np->tf->eax = 0;
-
-    for (i = 0; i < NOFILE; i++)
-        if (p->ofile[i])
-            np->ofile[i] = filedup(p->ofile[i]);
-    if ((np->cwd = namei(p->name)) == 0)
-        return -1;
-
-    safestrcpy(np->name, p->name, sizeof(p->name));
-
-    pid = np->pid;
-
-    // lock to force the compiler to emit the np->state write last.
-    acquire(&ptable.lock);
-    np->state = RUNNABLE;
-    release(&ptable.lock);
-
+    //TODO
     return pid;
 }

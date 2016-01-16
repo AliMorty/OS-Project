@@ -7,7 +7,7 @@
 int main()
 {
     int i;
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 20; i++)
     {
         printf(2, "Counter: %d\n", i);
         if (i == 10) isvpcb();
