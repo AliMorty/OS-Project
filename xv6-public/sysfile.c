@@ -467,8 +467,9 @@ sys_pipe(void)
     fd[1] = fd1;
     return 0;
 }
-
-///////MINE!/////////
+///////////////////////////////////////////////////////////////
+//////////////////////////MINE!////////////////////////////////
+///////////////////////////////////////////////////////////////
 int
 my_open(char* p,int om)
 {
@@ -528,35 +529,60 @@ sys_isvpcb(void)
     int fd, file_size;
     pte_t *pte;
     uint pa, i;
-
+/////////////////////////Saving UVM///////////////////////////////
     //Creating file for UVM
     fd = my_open("pages",O_CREATE|O_RDWR);
-    if (fd < 0) { cprintf("Error:Failed to create file.\n"); exit();} //Checking for errors in creating file
-    cprintf("Create file succeeded\n");
+    if (fd < 0) { cprintf("Error:Failed to create UVM file.\n"); exit();} //Checking for errors in creating file
+    cprintf("Created UVM file.\n");
     struct file *f = proc->ofile[fd];
 
     //Coping the user virtual memory and writing to the file
     for(i = 0; i < proc->sz; i += PGSIZE)
     {
         if((pte = ns_walkpgdir(proc->pgdir, (void *) i, 0)) == 0)
-            panic("copyuvm: pte should exist");
+            panic("copyuvm: pte should exist.");
         if(!(*pte & PTE_P))
-            panic("copyuvm: page not present");
+            panic("copyuvm: page not present.");
         pa = PTE_ADDR(*pte);
 
         //writing to file
         file_size =filewrite(f, (char*)p2v(pa), PGSIZE);
         //Checking for write errors
         if (file_size != PGSIZE)
-        { cprintf("Error:Failed to write file.\n"); exit(); }
-        cprintf("Page %d write was successful.\n",i/PGSIZE);
+        { cprintf("Error:Failed to write UVM file.\n"); exit(); }
+        cprintf("Written UVM Page %d.\n",i/PGSIZE);
     }
     proc->ofile[fd] = 0;
     fileclose(f);
-
-    //TODO: Creating file for context
-    //TODO: Creating file for tf
-    //TODO: Creating file for proc
+/////////////////////////Saving context///////////////////////////////
+    //Creating file for context
+    fd = my_open("context",O_CREATE|O_RDWR);
+    if (fd < 0) { cprintf("Error:Failed to create context file.\n"); exit();} //Checking for errors in creating file
+    cprintf("Created context file.\n");
+    f = proc->ofile[fd];
+    //writing to file
+    file_size =filewrite(f, (char*)proc->context, sizeof(struct context));
+    //Checking for write errors
+    if (file_size != sizeof(struct context))
+    { cprintf("Error:Failed to write context file.\n"); exit(); }
+    cprintf("Written context file.\n",i/PGSIZE);
+    proc->ofile[fd] = 0;
+    fileclose(f);
+///////////////////////////Saving tf/////////////////////////////////
+    //Creating file for tf
+    fd = my_open("tf",O_CREATE|O_RDWR);
+    if (fd < 0) { cprintf("Error:Failed to create tf file.\n"); exit();} //Checking for errors in creating file
+    cprintf("Created tf file.\n");
+    f = proc->ofile[fd];
+    //writing to file
+    file_size =filewrite(f, (char*)proc->tf, sizeof(struct tf));
+    //Checking for write errors
+    if (file_size != sizeof(struct tf))
+    { cprintf("Error:Failed to write tf file.\n"); exit(); }
+    cprintf("Written tf file.\n",i/PGSIZE);
+    proc->ofile[fd] = 0;
+    fileclose(f);
+//////////////////////////Saving proc////////////////////////////////
 
     return 0;
 
