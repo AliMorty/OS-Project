@@ -6,7 +6,8 @@
 int main()
 {
     printf(1,"Starting the child\n");
-    for (int i = 0; i < 50; i++)
+    int i;
+    for (i = 0; i < 50; i++)
         printf(2, "Counter: %d\n", i);
     exit();
 }

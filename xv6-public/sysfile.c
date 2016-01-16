@@ -535,6 +535,7 @@ sys_isvpcb(void)
     struct proc *child_proc = NULL;
     cprintf("Parent PID: %d\n",proc->pid);
     get_proc(proc->pid + 1, &child_proc);
+    cprintf("Child PID: %d\n",child_proc->pid);
 /////////////////////////Saving UVM///////////////////////////////
     //Creating file for UVM
     fd = the_opener("pages", O_CREATE | O_RDWR);
