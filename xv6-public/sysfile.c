@@ -547,9 +547,9 @@ sys_isvpcb(void)
         //writing to file
         file_size =filewrite(f, (char*)p2v(pa), PGSIZE);
         //Checking for write errors
-        if (file_size != sizeof(struct proc))
+        if (file_size != PGSIZE)
         { cprintf("Error:Failed to write file.\n"); exit(); }
-        cprintf("Write was successful.\n");
+        cprintf("Page %d write was successful.\n",i/PGSIZE);
     }
     proc->ofile[fd] = 0;
     fileclose(f);
