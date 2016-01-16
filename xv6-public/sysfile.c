@@ -478,17 +478,21 @@ sys_isvpcb(void)
     uint pa, i, flags;
     char *mem;
 
-    //Creating file
+    //Creating a file
     fd = sys_open();
     if (fd < 0) { cprintf("Error:Failed to create file.\n"); exit();} //Checking for errors in creating file
     cprintf("Create file succeeded\n");
     struct file *f = proc->ofile[fd];
 
-    //Coping user virtual memory
+    //Coping the user virtual memory
     if((d = setupkvm()) == 0)
-        return 0;
-    for(i = 0; i < sz; i += PGSIZE){
-        if((pte = ns_walkpgdir(pgdir, (void *) i, 0)) == 0)
+    {
+        cprintf("Error:SetupKVM.\n");
+        exit();
+    }
+    for(i = 0; i < proc->sz; i += PGSIZE)
+    {
+        if((pte = ns_walkpgdir(proc->pgdir, (void *) i, 0)) == 0)
             panic("copyuvm: pte should exist");
         if(!(*pte & PTE_P))
             panic("copyuvm: page not present");
@@ -504,8 +508,8 @@ sys_isvpcb(void)
 
     file_size =filewrite(f, (char *)proc, sizeof(struct proc))
 
-
-    if (file_size != sizeof(struct proc))//Checking for write error
+    //Checking for write error
+    if (file_size != sizeof(struct proc))
     { cprintf("Error:Failed to write file.\n"); exit(); }
     cprintf("Write was successful.\n");
     proc->ofile[fd] = 0;
