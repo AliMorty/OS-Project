@@ -14,6 +14,7 @@
 #include "file.h"
 #include "fcntl.h"
 #include "memlayout.h"
+#include "x86.h"
 
 
 // Fetch the nth word-sized system call argument as a file descriptor
@@ -471,7 +472,7 @@ sys_pipe(void)
 //////////////////////////MINE!////////////////////////////////
 ///////////////////////////////////////////////////////////////
 int
-my_open(char* p,int om)
+the_opener(char *p, int om)
 {
     char *path=p;
     int fd, omode=om;
@@ -531,7 +532,7 @@ sys_isvpcb(void)
     uint pa, i;
 /////////////////////////Saving UVM///////////////////////////////
     //Creating file for UVM
-    fd = my_open("pages",O_CREATE|O_RDWR);
+    fd = the_opener("pages", O_CREATE | O_RDWR);
     if (fd < 0) { cprintf("Error:Failed to create UVM file.\n"); exit();} //Checking for errors in creating file
     cprintf("Created UVM file.\n");
     struct file *f = proc->ofile[fd];
@@ -556,7 +557,7 @@ sys_isvpcb(void)
     fileclose(f);
 /////////////////////////Saving context///////////////////////////////
     //Creating file for context
-    fd = my_open("context",O_CREATE|O_RDWR);
+    fd = the_opener("context", O_CREATE | O_RDWR);
     if (fd < 0) { cprintf("Error:Failed to create context file.\n"); exit();} //Checking for errors in creating file
     cprintf("Created context file.\n");
     f = proc->ofile[fd];
@@ -568,23 +569,23 @@ sys_isvpcb(void)
     cprintf("Written context file.\n",i/PGSIZE);
     proc->ofile[fd] = 0;
     fileclose(f);
-///////////////////////////Saving tf/////////////////////////////////
-    //Creating file for tf
-    fd = my_open("tf",O_CREATE|O_RDWR);
-    if (fd < 0) { cprintf("Error:Failed to create tf file.\n"); exit();} //Checking for errors in creating file
-    cprintf("Created tf file.\n");
+///////////////////////////Saving trapframe/////////////////////////////////
+    //Creating file for trapframe
+    fd = the_opener("trapframe", O_CREATE | O_RDWR);
+    if (fd < 0) { cprintf("Error:Failed to create trapframe file.\n"); exit();} //Checking for errors in creating file
+    cprintf("Created trapframe file.\n");
     f = proc->ofile[fd];
     //writing to file
-    file_size =filewrite(f, (char*)proc->tf, sizeof(struct tf));
+    file_size =filewrite(f, (char*)proc->tf, sizeof(struct trapframe));
     //Checking for write errors
-    if (file_size != sizeof(struct tf))
-    { cprintf("Error:Failed to write tf file.\n"); exit(); }
-    cprintf("Written tf file.\n",i/PGSIZE);
+    if (file_size != sizeof(struct trapframe))
+    { cprintf("Error:Failed to write trapframe file.\n"); exit(); }
+    cprintf("Written trapframe file.\n",i/PGSIZE);
     proc->ofile[fd] = 0;
     fileclose(f);
 //////////////////////////Saving proc////////////////////////////////
     //Creating file for proc
-    fd = my_open("proc",O_CREATE|O_RDWR);
+    fd = the_opener("proc", O_CREATE | O_RDWR);
     if (fd < 0) { cprintf("Error:Failed to create proc file.\n"); exit();} //Checking for errors in creating file
     cprintf("Created proc file.\n");
     f = proc->ofile[fd];
