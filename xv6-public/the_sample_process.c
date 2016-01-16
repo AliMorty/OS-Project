@@ -5,7 +5,7 @@
 //
 int main()
 {
-    for(int i=0 ; i<50 ; i++)
-        printf(2,"Counter: %d\n",i);
+    for (int i = 0; i < 50; i++)
+        printf(2, "Counter: %d\n", i);
     return 0;
 }

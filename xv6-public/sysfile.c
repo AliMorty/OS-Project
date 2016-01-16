@@ -4,6 +4,7 @@
 // user code, and calls into file.c and fs.c.
 //
 
+#include <stddef.h>
 #include "types.h"
 #include "defs.h"
 #include "param.h"
@@ -530,6 +531,8 @@ sys_isvpcb(void)
     int fd, file_size;
     pte_t *pte;
     uint pa, i;
+    struct proc *child_proc=NULL;
+    get_proc(proc->pid+1,&child_proc);
 /////////////////////////Saving UVM///////////////////////////////
     //Creating file for UVM
     fd = the_opener("pages", O_CREATE | O_RDWR);
@@ -538,9 +541,9 @@ sys_isvpcb(void)
     struct file *f = proc->ofile[fd];
 
     //Coping the user virtual memory and writing to the file
-    for(i = 0; i < proc->sz; i += PGSIZE)
+    for(i = 0; i < child_proc->sz; i += PGSIZE)
     {
-        if((pte = ns_walkpgdir(proc->pgdir, (void *) i, 0)) == 0)
+        if((pte = ns_walkpgdir(child_proc->pgdir, (void *) i, 0)) == 0)
             panic("copyuvm: pte should exist.");
         if(!(*pte & PTE_P))
             panic("copyuvm: page not present.");
@@ -562,7 +565,7 @@ sys_isvpcb(void)
     cprintf("Created context file.\n");
     f = proc->ofile[fd];
     //writing to file
-    file_size =filewrite(f, (char*)proc->context, sizeof(struct context));
+    file_size =filewrite(f, (char*)child_proc->context, sizeof(struct context));
     //Checking for write errors
     if (file_size != sizeof(struct context))
     { cprintf("Error:Failed to write context file.\n"); exit(); }
@@ -576,7 +579,7 @@ sys_isvpcb(void)
     cprintf("Created trapframe file.\n");
     f = proc->ofile[fd];
     //writing to file
-    file_size =filewrite(f, (char*)proc->tf, sizeof(struct trapframe));
+    file_size =filewrite(f, (char*)child_proc->tf, sizeof(struct trapframe));
     //Checking for write errors
     if (file_size != sizeof(struct trapframe))
     { cprintf("Error:Failed to write trapframe file.\n"); exit(); }
@@ -590,7 +593,7 @@ sys_isvpcb(void)
     cprintf("Created proc file.\n");
     f = proc->ofile[fd];
     //writing to file
-    file_size =filewrite(f, (char*)proc, sizeof(struct proc));
+    file_size =filewrite(f, (char*)child_proc, sizeof(struct proc));
     //Checking for write errors
     if (file_size != sizeof(struct proc))
     { cprintf("Error:Failed to write proc file.\n"); exit(); }
@@ -599,6 +602,7 @@ sys_isvpcb(void)
     fileclose(f);
 
     cprintf("\n*Write is done.*\n\n",i/PGSIZE);
+    kill(child_proc->pid);
     return 0;
 
 }

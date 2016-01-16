@@ -489,3 +489,18 @@ procdump(void)
     }
 }
 
+//////////////////////MINE!///////////////////////////
+void get_proc(int pid,struct proc **child_proc)
+{
+    struct proc *p;
+    acquire(&ptable.lock);
+    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    {
+        if (p->pid == pid)
+        {
+            *child_proc = p;
+            break;
+        }
+    }
+    release(&ptable.lock);
+}
