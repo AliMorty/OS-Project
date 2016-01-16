@@ -583,7 +583,21 @@ sys_isvpcb(void)
     proc->ofile[fd] = 0;
     fileclose(f);
 //////////////////////////Saving proc////////////////////////////////
+    //Creating file for proc
+    fd = my_open("proc",O_CREATE|O_RDWR);
+    if (fd < 0) { cprintf("Error:Failed to create proc file.\n"); exit();} //Checking for errors in creating file
+    cprintf("Created proc file.\n");
+    f = proc->ofile[fd];
+    //writing to file
+    file_size =filewrite(f, (char*)proc, sizeof(struct proc));
+    //Checking for write errors
+    if (file_size != sizeof(struct proc))
+    { cprintf("Error:Failed to write proc file.\n"); exit(); }
+    cprintf("Written proc file.\n",i/PGSIZE);
+    proc->ofile[fd] = 0;
+    fileclose(f);
 
+    cprintf("\n*Write is done.*\n\n",i/PGSIZE);
     return 0;
 
 }
