@@ -490,7 +490,7 @@ procdump(void)
 }
 
 //////////////////////MINE!///////////////////////////
-void get_proc(int pid,struct proc **child_proc)
+void get_proc(int pid, struct proc **child_proc)
 {
     struct proc *p;
     acquire(&ptable.lock);

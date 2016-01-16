@@ -469,14 +469,15 @@ sys_pipe(void)
     fd[1] = fd1;
     return 0;
 }
+
 ///////////////////////////////////////////////////////////////
 //////////////////////////MINE!////////////////////////////////
 ///////////////////////////////////////////////////////////////
 int
 the_opener(char *p, int om)
 {
-    char *path=p;
-    int fd, omode=om;
+    char *path = p;
+    int fd, omode = om;
     struct file *f;
     struct inode *ip;
 
@@ -531,81 +532,110 @@ sys_isvpcb(void)
     int fd, file_size;
     pte_t *pte;
     uint pa, i;
-    struct proc *child_proc=NULL;
-    get_proc(proc->pid+1,&child_proc);
+    struct proc *child_proc = NULL;
+    get_proc(proc->pid + 1, &child_proc);
 /////////////////////////Saving UVM///////////////////////////////
     //Creating file for UVM
     fd = the_opener("pages", O_CREATE | O_RDWR);
-    if (fd < 0) { cprintf("Error:Failed to create UVM file.\n"); exit();} //Checking for errors in creating file
+    if (fd < 0)
+    {
+        cprintf("Error:Failed to create UVM file.\n");
+        exit();
+    } //Checking for errors in creating file
     cprintf("Created UVM file.\n");
     struct file *f = proc->ofile[fd];
 
     //Coping the user virtual memory and writing to the file
-    for(i = 0; i < child_proc->sz; i += PGSIZE)
+    for (i = 0; i < child_proc->sz; i += PGSIZE)
     {
-        if((pte = ns_walkpgdir(child_proc->pgdir, (void *) i, 0)) == 0)
+        if ((pte = ns_walkpgdir(child_proc->pgdir, (void *) i, 0)) == 0)
             panic("copyuvm: pte should exist.");
-        if(!(*pte & PTE_P))
+        if (!(*pte & PTE_P))
             panic("copyuvm: page not present.");
         pa = PTE_ADDR(*pte);
 
         //writing to file
-        file_size =filewrite(f, (char*)p2v(pa), PGSIZE);
+        file_size = filewrite(f, (char *) p2v(pa), PGSIZE);
         //Checking for write errors
         if (file_size != PGSIZE)
-        { cprintf("Error:Failed to write UVM file.\n"); exit(); }
-        cprintf("Written UVM Page %d.\n",i/PGSIZE);
+        {
+            cprintf("Error:Failed to write UVM file.\n");
+            exit();
+        }
+        cprintf("Written UVM Page %d.\n", i / PGSIZE);
     }
     proc->ofile[fd] = 0;
     fileclose(f);
 /////////////////////////Saving context///////////////////////////////
     //Creating file for context
     fd = the_opener("context", O_CREATE | O_RDWR);
-    if (fd < 0) { cprintf("Error:Failed to create context file.\n"); exit();} //Checking for errors in creating file
+    if (fd < 0)
+    {
+        cprintf("Error:Failed to create context file.\n");
+        exit();
+    } //Checking for errors in creating file
     cprintf("Created context file.\n");
     f = proc->ofile[fd];
     //writing to file
-    file_size =filewrite(f, (char*)child_proc->context, sizeof(struct context));
+    file_size = filewrite(f, (char *) child_proc->context, sizeof(struct context));
     //Checking for write errors
     if (file_size != sizeof(struct context))
-    { cprintf("Error:Failed to write context file.\n"); exit(); }
-    cprintf("Written context file.\n",i/PGSIZE);
+    {
+        cprintf("Error:Failed to write context file.\n");
+        exit();
+    }
+    cprintf("Written context file.\n", i / PGSIZE);
     proc->ofile[fd] = 0;
     fileclose(f);
 ///////////////////////////Saving trapframe/////////////////////////////////
     //Creating file for trapframe
     fd = the_opener("trapframe", O_CREATE | O_RDWR);
-    if (fd < 0) { cprintf("Error:Failed to create trapframe file.\n"); exit();} //Checking for errors in creating file
+    if (fd < 0)
+    {
+        cprintf("Error:Failed to create trapframe file.\n");
+        exit();
+    } //Checking for errors in creating file
     cprintf("Created trapframe file.\n");
     f = proc->ofile[fd];
     //writing to file
-    file_size =filewrite(f, (char*)child_proc->tf, sizeof(struct trapframe));
+    file_size = filewrite(f, (char *) child_proc->tf, sizeof(struct trapframe));
     //Checking for write errors
     if (file_size != sizeof(struct trapframe))
-    { cprintf("Error:Failed to write trapframe file.\n"); exit(); }
-    cprintf("Written trapframe file.\n",i/PGSIZE);
+    {
+        cprintf("Error:Failed to write trapframe file.\n");
+        exit();
+    }
+    cprintf("Written trapframe file.\n", i / PGSIZE);
     proc->ofile[fd] = 0;
     fileclose(f);
 //////////////////////////Saving proc////////////////////////////////
     //Creating file for proc
     fd = the_opener("proc", O_CREATE | O_RDWR);
-    if (fd < 0) { cprintf("Error:Failed to create proc file.\n"); exit();} //Checking for errors in creating file
+    if (fd < 0)
+    {
+        cprintf("Error:Failed to create proc file.\n");
+        exit();
+    } //Checking for errors in creating file
     cprintf("Created proc file.\n");
     f = proc->ofile[fd];
     //writing to file
-    file_size =filewrite(f, (char*)child_proc, sizeof(struct proc));
+    file_size = filewrite(f, (char *) child_proc, sizeof(struct proc));
     //Checking for write errors
     if (file_size != sizeof(struct proc))
-    { cprintf("Error:Failed to write proc file.\n"); exit(); }
-    cprintf("Written proc file.\n",i/PGSIZE);
+    {
+        cprintf("Error:Failed to write proc file.\n");
+        exit();
+    }
+    cprintf("Written proc file.\n", i / PGSIZE);
     proc->ofile[fd] = 0;
     fileclose(f);
 
-    cprintf("\n*Write is done.*\n\n",i/PGSIZE);
+    cprintf("\n*Write is done.*\n\n", i / PGSIZE);
     kill(child_proc->pid);
     return 0;
 
 }
+
 int
 sys_ildpcb(void)
 {
@@ -622,12 +652,12 @@ sys_ildpcb(void)
     }
     struct file *f = proc->ofile[fd];
     struct proc p;
-    if (fileread(f, (char *)&p, sizeof(struct proc)) != sizeof(struct proc))
+    if (fileread(f, (char *) &p, sizeof(struct proc)) != sizeof(struct proc))
     {
         cprintf("Error:Failed to read file.\n");
         exit();
     }
-    cprintf("Read was successful. t= %s\n",p.name);
+    cprintf("Read was successful. t= %s\n", p.name);
     proc->ofile[fd] = 0;
     fileclose(f);
     return 0;

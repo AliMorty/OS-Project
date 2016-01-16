@@ -119,7 +119,7 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-void            get_proc(int pid,struct proc **child_proc)////////MINE!
+void            get_proc(int, struct proc **);////////////////////MINE!
 
 // swtch.S
 void            swtch(struct context**, struct context*);
