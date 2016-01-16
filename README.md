@@ -1,2 +1,2 @@
 # OS-Project
-TheAwesomelyGreartQuiteFabulousAndPhenomenalSupurbOSProject
+TheAwesomelyGreartQuiteFabulousPhenomenalSupurbOSProject
