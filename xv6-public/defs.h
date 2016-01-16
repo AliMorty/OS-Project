@@ -120,7 +120,7 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 void            get_proc(int, struct proc **);////////////////////MINE!
-void    load_the_proc(struct proc proc, struct file *page_file, struct file *flag_file, uint size, struct trapframe tf);///////MINE!
+void    load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file);///////MINE!
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -182,6 +182,7 @@ void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
 uint *          ns_walkpgdir(pde_t *pgdir, const void *va, int alloc);/////////MINE!
+pde_t *         copyuvm2(struct file *page_file, struct file *flag_file, uint size);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

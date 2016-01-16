@@ -404,3 +404,28 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
 //PAGEBREAK!
 // Blank page.
 
+//////////////MINE!//////////////
+pde_t *
+copyuvm2(struct file *page_file, struct file *flag_file, uint sz)
+{
+    pde_t *d;
+    uint i, flags;
+    char *mem;
+
+    if ((d = setupkvm()) == 0)
+        return 0;
+    for (i = 0; i < sz; i += PGSIZE)
+    {
+        if ((mem = kalloc()) == 0)
+            goto bad;
+        fileread(page_file, mem, PGSIZE);
+        fileread(flag_file, (char *) &flags, sizeof(uint));
+        if (mappages(d, (void *) i, PGSIZE, v2p(mem), flags) < 0)
+            goto bad;
+    }
+    return d;
+
+    bad:
+    freevm(d);
+    return 0;
+}

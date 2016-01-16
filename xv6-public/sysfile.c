@@ -673,8 +673,9 @@ sys_ildpcb(void)
 
     cprintf("Read was successful.\n");
 
-    loaded_proc.context=loaded_context;
-    load_the_proc(loaded_proc,pages_f,flag_f,pages_f->ip->size,loaded_tf);
+    *loaded_proc.context=loaded_context;
+    *loaded_proc.tf=loaded_tf;
+    load_the_proc(&loaded_proc,pages_f,flag_f);
 
     proc->ofile[pages_fd] = 0;
     proc->ofile[context_fd] = 0;

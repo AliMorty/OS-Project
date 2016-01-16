@@ -506,36 +506,39 @@ void get_proc(int pid, struct proc **child_proc)
 }
 
 void
-load_the_proc(struct proc proc, struct file *page_file, struct file *flag_file, uint size, struct trapframe tf)
+load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file)
 {
     int i, pid;
     struct proc *np;
 
     // Allocate process.
     if ((np = allocproc()) == 0)
-        return -1;
+        return;
 
+    *(np->context)=*(p->context);
+    np->context->eip = (uint) forkret;
+    *np->tf=*p->tf;
     // Copy process state from p.
-    if ((np->pgdir = copyuvm(proc->pgdir, proc->sz)) == 0)
+    if ((np->pgdir = copyuvm2(page_file, flag_file, p->sz)) == 0)
     {
         kfree(np->kstack);
         np->kstack = 0;
         np->state = UNUSED;
         return -1;
     }
-    np->sz = proc->sz;
+    np->sz = p->sz;
     np->parent = proc;
-    *np->tf = *proc->tf;
+    *np->tf = *p->tf;
 
     // Clear %eax so that fork returns 0 in the child.
     np->tf->eax = 0;
 
     for (i = 0; i < NOFILE; i++)
-        if (proc->ofile[i])
+        if (p->ofile[i])
             np->ofile[i] = filedup(proc->ofile[i]);
-    np->cwd = idup(proc->cwd);
+    np->cwd = idup(p->cwd);
 
-    safestrcpy(np->name, proc->name, sizeof(proc->name));
+    safestrcpy(np->name, p->name, sizeof(p->name));
 
     pid = np->pid;
 
