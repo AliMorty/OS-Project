@@ -641,27 +641,28 @@ sys_isvpcb(void)
 int
 sys_ildpcb(void)
 {
-    int fd;
+    int page_fd, context_fd, tf_fd, proc_fd;
+    struct file *page_f, *context_f, *tf_f, *proc_f;
 
-    fd = sys_open();
-    if (fd >= 0)
+    //Creating file for UVM
+    page_fd = the_opener("pages", O_RDONLY);
+    if (page_fd < 0)
     {
-        cprintf("Open file succeeded\n");
-    } else
-    {
-        cprintf("Error:Failed to open file.\n");
+        cprintf("Error:Failed to open uvm file.\n");
         exit();
-    }
-    struct file *f = proc->ofile[fd];
-    struct proc p;
-    if (fileread(f, (char *) &p, sizeof(struct proc)) != sizeof(struct proc))
+    } //Checking for errors in creating file
+    cprintf("Opened uvm file.\n");
+    page_f = proc->ofile[page_fd];
+
+    char* p;
+    if (fileread(page_f, (char *) &p, sizeof(struct proc)) != sizeof(struct proc))
     {
         cprintf("Error:Failed to read file.\n");
         exit();
     }
-    cprintf("Read was successful. t= %s\n", p.name);
-    proc->ofile[fd] = 0;
-    fileclose(f);
+    cprintf("Read was successful.\n");
+    proc->ofile[page_fd] = 0;
+    fileclose(page_f);
     return 0;
 }
 
