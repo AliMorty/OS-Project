@@ -13,6 +13,7 @@
 #include "fs.h"
 #include "file.h"
 #include "fcntl.h"
+#include "memlayout.h"
 
 
 // Fetch the nth word-sized system call argument as a file descriptor
@@ -471,26 +472,48 @@ sys_pipe(void)
 int
 sys_isvpcb(void)
 {
-    int fd;
+    int fd, file_size;
+    pde_t *d;
+    pte_t *pte;
+    uint pa, i, flags;
+    char *mem;
 
+    //Creating file
     fd = sys_open();
-    if (fd >= 0)
-    {
-        cprintf("Create file succeeded\n");
-    } else
-    {
-        cprintf("Error:Failed to create file.\n");
-        exit();
-    }
+    if (fd < 0) { cprintf("Error:Failed to create file.\n"); exit();} //Checking for errors in creating file
+    cprintf("Create file succeeded\n");
     struct file *f = proc->ofile[fd];
-    if (filewrite(f, (char *)proc, sizeof(struct proc)) != sizeof(struct proc))
-    {
-        cprintf("Error:Failed to write file.\n");
-        exit();
+
+    //Coping user virtual memory
+    if((d = setupkvm()) == 0)
+        return 0;
+    for(i = 0; i < sz; i += PGSIZE){
+        if((pte = ns_walkpgdir(pgdir, (void *) i, 0)) == 0)
+            panic("copyuvm: pte should exist");
+        if(!(*pte & PTE_P))
+            panic("copyuvm: page not present");
+        pa = PTE_ADDR(*pte);
+        flags = PTE_FLAGS(*pte);
+        if((mem = kalloc()) == 0)
+            goto bad;
+        memmove(mem, (char*)p2v(pa), PGSIZE);
+        if(mappages(d, (void*)i, PGSIZE, v2p(mem), flags) < 0)
+            goto bad;
     }
+//    return d;
+
+    file_size =filewrite(f, (char *)proc, sizeof(struct proc))
+
+
+    if (file_size != sizeof(struct proc))//Checking for write error
+    { cprintf("Error:Failed to write file.\n"); exit(); }
     cprintf("Write was successful.\n");
     proc->ofile[fd] = 0;
     fileclose(f);
+    return 0;
+
+    bad:
+    freevm(d);
     return 0;
 }
 int
