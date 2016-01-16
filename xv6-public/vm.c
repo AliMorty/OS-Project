@@ -66,7 +66,7 @@ walkpgdir(pde_t *pgdir, const void *va, int alloc)
     return &pgtab[PTX(va)];
 }
 
-pte_t *
+uint *
 ns_walkpgdir(pde_t *pgdir, const void *va, int alloc)
 {
     return walkpgdir(pgdir, va, alloc);

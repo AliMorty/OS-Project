@@ -526,10 +526,8 @@ int
 sys_isvpcb(void)
 {
     int fd, file_size;
-    pde_t *d;
     pte_t *pte;
-    uint pa, i, flags;
-    char *mem;
+    uint pa, i;
 
     //Creating file for page
     fd = my_open("pages",O_CREATE|O_RDWR);
