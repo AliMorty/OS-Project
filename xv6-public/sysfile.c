@@ -529,9 +529,9 @@ the_opener(char *p, int om)
 int
 sys_isvpcb(void)
 {
-    int fd, file_size;
+    int fd, fd2, file_size;
     pte_t *pte;
-    uint pa, i;
+    uint pa, i, flag;
     struct proc *child_proc = NULL;
     cprintf("Parent PID: %d\n",proc->pid);
     get_proc(proc->pid + 1, &child_proc);
@@ -539,6 +539,7 @@ sys_isvpcb(void)
 /////////////////////////Saving UVM///////////////////////////////
     //Creating file for UVM
     fd = the_opener("pages", O_CREATE | O_RDWR);
+    fd2 = the_opener("flag", O_CREATE | O_RDWR);
     if (fd < 0)
     {
         cprintf("Error:Failed to create UVM file.\n");
@@ -546,6 +547,7 @@ sys_isvpcb(void)
     } //Checking for errors in creating file
     cprintf("Created UVM file.\n");
     struct file *f = proc->ofile[fd];
+    struct file *f2 = proc->ofile[fd2];
 
     //Coping the user virtual memory and writing to the file
     for (i = 0; i < child_proc->sz; i += PGSIZE)
@@ -555,9 +557,11 @@ sys_isvpcb(void)
         if (!(*pte & PTE_P))
             panic("copyuvm: page not present.");
         pa = PTE_ADDR(*pte);
+        flag = PTE_FLAGS(*pte);
 
         //writing to file
         file_size = filewrite(f, (char *) p2v(pa), PGSIZE);
+        filewrite(f2, (char *)&flag , sizeof(uint));
         //Checking for write errors
         if (file_size != PGSIZE)
         {
@@ -567,7 +571,9 @@ sys_isvpcb(void)
         cprintf("Written UVM Page %d.\n", i / PGSIZE);
     }
     proc->ofile[fd] = 0;
+    proc->ofile[fd2] = 0;
     fileclose(f);
+    fileclose(f2);
 /////////////////////////Saving context///////////////////////////////
     //Creating file for context
     fd = the_opener("context", O_CREATE | O_RDWR);
@@ -632,6 +638,7 @@ sys_isvpcb(void)
     proc->ofile[fd] = 0;
     fileclose(f);
 
+
     cprintf("\n*Write is done.*\n\n", i / PGSIZE);
     kill(child_proc->pid);
     return 0;
@@ -641,28 +648,43 @@ sys_isvpcb(void)
 int
 sys_ildpcb(void)
 {
-    int page_fd, context_fd, tf_fd, proc_fd;
-    struct file *page_f, *context_f, *tf_f, *proc_f;
 
-    //Creating file for UVM
-    page_fd = the_opener("pages", O_RDONLY);
-    if (page_fd < 0)
-    {
-        cprintf("Error:Failed to open uvm file.\n");
-        exit();
-    } //Checking for errors in creating file
-    cprintf("Opened uvm file.\n");
-    page_f = proc->ofile[page_fd];
+    //Creating files
+    int pages_fd = the_opener("pages", O_RDONLY);
+    int context_fd = the_opener("context", O_RDONLY);
+    int tf_fd = the_opener("trapframe", O_RDONLY);
+    int proc_fd = the_opener("proc", O_RDONLY);
+    int flag_fd = the_opener("flag", O_RDONLY);
+    struct file *pages_f = proc->ofile[pages_fd];
+    struct file *context_f = proc->ofile[context_fd];
+    struct file *tf_f = proc->ofile[tf_fd];
+    struct file *proc_f = proc->ofile[proc_fd];
+    struct file *flag_f = proc->ofile[flag_fd];
 
-    char* p;
-    if (fileread(page_f, (char *) &p, sizeof(struct proc)) != sizeof(struct proc))
-    {
-        cprintf("Error:Failed to read file.\n");
-        exit();
-    }
+    //Reading files
+    struct context loaded_context;
+    struct trapframe loaded_tf;
+    struct proc loaded_proc;
+    fileread(context_f, (char *) &loaded_context, sizeof(struct context));
+    fileread(tf_f, (char *) &loaded_tf, sizeof(struct trapframe));
+    fileread(proc_f, (char *) &loaded_proc, sizeof(struct proc));
+
     cprintf("Read was successful.\n");
-    proc->ofile[page_fd] = 0;
-    fileclose(page_f);
+
+    loaded_proc.context=loaded_context;
+    loaded_proc.tf=loaded_tf;
+    copy_proc(loaded_proc,);
+
+
+
+    proc->ofile[pages_fd] = 0;
+    proc->ofile[context_fd] = 0;
+    proc->ofile[tf_fd] = 0;
+    proc->ofile[proc_fd] = 0;
+    fileclose(pages_f);
+    fileclose(context_f);
+    fileclose(tf_f);
+    fileclose(proc_f);
     return 0;
 }
 
