@@ -529,7 +529,7 @@ sys_isvpcb(void)
     pte_t *pte;
     uint pa, i;
 
-    //Creating file for page
+    //Creating file for UVM
     fd = my_open("pages",O_CREATE|O_RDWR);
     if (fd < 0) { cprintf("Error:Failed to create file.\n"); exit();} //Checking for errors in creating file
     cprintf("Create file succeeded\n");
@@ -554,10 +554,9 @@ sys_isvpcb(void)
     proc->ofile[fd] = 0;
     fileclose(f);
 
-    //context
-    //tf
-    //proc
-
+    //TODO: Creating file for context
+    //TODO: Creating file for tf
+    //TODO: Creating file for proc
 
     return 0;
 

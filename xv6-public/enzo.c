@@ -3,7 +3,6 @@
 //
 
 #include "user.h"
-#include "fcntl.h"
 
 int main()
 {
