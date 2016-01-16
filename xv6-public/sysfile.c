@@ -295,6 +295,8 @@ create(char *path, short type, short major, short minor)
     return ip;
 }
 
+
+
 int
 sys_open(void)
 {
@@ -672,10 +674,7 @@ sys_ildpcb(void)
     cprintf("Read was successful.\n");
 
     loaded_proc.context=loaded_context;
-    loaded_proc.tf=loaded_tf;
-    copy_proc(loaded_proc,);
-
-
+    load_the_proc(loaded_proc,pages_f,flag_f,pages_f->ip->size,loaded_tf);
 
     proc->ofile[pages_fd] = 0;
     proc->ofile[context_fd] = 0;
@@ -687,4 +686,6 @@ sys_ildpcb(void)
     fileclose(proc_f);
     return 0;
 }
+
+
 

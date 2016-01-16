@@ -505,10 +505,15 @@ void get_proc(int pid, struct proc **child_proc)
     release(&ptable.lock);
 }
 
-int
-copy_proc(struct proc *np,)
+void
+load_the_proc(struct proc proc, struct file *page_file, struct file *flag_file, uint size, struct trapframe tf)
 {
     int i, pid;
+    struct proc *np;
+
+    // Allocate process.
+    if ((np = allocproc()) == 0)
+        return -1;
 
     // Copy process state from p.
     if ((np->pgdir = copyuvm(proc->pgdir, proc->sz)) == 0)
@@ -539,5 +544,4 @@ copy_proc(struct proc *np,)
     np->state = RUNNABLE;
     release(&ptable.lock);
 
-    return pid;
 }

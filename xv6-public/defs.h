@@ -120,6 +120,7 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 void            get_proc(int, struct proc **);////////////////////MINE!
+void    load_the_proc(struct proc proc, struct file *page_file, struct file *flag_file, uint size, struct trapframe tf);///////MINE!
 
 // swtch.S
 void            swtch(struct context**, struct context*);
