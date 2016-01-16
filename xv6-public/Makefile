@@ -174,6 +174,7 @@ UPROGS=\
 	_zombie\
 	_enzo\
 	_the_sample_process\
+	_morty\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

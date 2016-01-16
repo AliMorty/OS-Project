@@ -25,6 +25,5 @@ int main()
         isvpcb();
         wait();
     }
-//    ildpcb("tmp",O_RDONLY);
     exit();
 }
