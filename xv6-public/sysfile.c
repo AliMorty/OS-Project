@@ -533,6 +533,7 @@ sys_isvpcb(void)
     pte_t *pte;
     uint pa, i;
     struct proc *child_proc = NULL;
+    cprintf("Parent PID: %d\n",proc->pid);
     get_proc(proc->pid + 1, &child_proc);
 /////////////////////////Saving UVM///////////////////////////////
     //Creating file for UVM

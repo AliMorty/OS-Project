@@ -18,6 +18,7 @@ int main()
     else if (pid == 0)//child
     {
         exec(child, (char **) input);
+        printf(1, "Child process started.\n");
     }
     else//parent
     {
@@ -25,5 +26,5 @@ int main()
         wait();
     }
 //    ildpcb("tmp",O_RDONLY);
-    return 0;
+    exit();
 }
