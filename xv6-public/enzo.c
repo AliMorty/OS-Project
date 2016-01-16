@@ -7,7 +7,7 @@
 
 int main()
 {
-    isvpcb("tmp",O_CREATE|O_RDWR);
-    ildpcb("tmp",O_RDONLY);
+    isvpcb();
+//    ildpcb("tmp",O_RDONLY);
     return 0;
 }

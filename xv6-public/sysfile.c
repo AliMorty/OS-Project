@@ -470,6 +470,59 @@ sys_pipe(void)
 
 ///////MINE!/////////
 int
+my_open(char* p,int om)
+{
+    char *path=p;
+    int fd, omode=om;
+    struct file *f;
+    struct inode *ip;
+
+    begin_op();
+
+    if (omode & O_CREATE)
+    {
+        ip = create(path, T_FILE, 0, 0);
+        if (ip == 0)
+        {
+            end_op();
+            return -1;
+        }
+    } else
+    {
+        if ((ip = namei(path)) == 0)
+        {
+            end_op();
+            return -1;
+        }
+        ilock(ip);
+        if (ip->type == T_DIR && omode != O_RDONLY)
+        {
+            iunlockput(ip);
+            end_op();
+            return -1;
+        }
+    }
+
+    if ((f = filealloc()) == 0 || (fd = fdalloc(f)) < 0)
+    {
+        if (f)
+            fileclose(f);
+        iunlockput(ip);
+        end_op();
+        return -1;
+    }
+    iunlock(ip);
+    end_op();
+
+    f->type = FD_INODE;
+    f->ip = ip;
+    f->off = 0;
+    f->readable = !(omode & O_WRONLY);
+    f->writable = (omode & O_WRONLY) || (omode & O_RDWR);
+    return fd;
+}
+
+int
 sys_isvpcb(void)
 {
     int fd, file_size;
@@ -478,18 +531,13 @@ sys_isvpcb(void)
     uint pa, i, flags;
     char *mem;
 
-    //Creating a file
-    fd = sys_open();
+    //Creating file for page
+    fd = my_open("pages",O_CREATE|O_RDWR);
     if (fd < 0) { cprintf("Error:Failed to create file.\n"); exit();} //Checking for errors in creating file
     cprintf("Create file succeeded\n");
     struct file *f = proc->ofile[fd];
 
-    //Coping the user virtual memory
-    if((d = setupkvm()) == 0)
-    {
-        cprintf("Error:SetupKVM.\n");
-        exit();
-    }
+    //Coping the user virtual memory and writing to the file
     for(i = 0; i < proc->sz; i += PGSIZE)
     {
         if((pte = ns_walkpgdir(proc->pgdir, (void *) i, 0)) == 0)
@@ -497,28 +545,24 @@ sys_isvpcb(void)
         if(!(*pte & PTE_P))
             panic("copyuvm: page not present");
         pa = PTE_ADDR(*pte);
-        flags = PTE_FLAGS(*pte);
-        if((mem = kalloc()) == 0)
-            goto bad;
-        memmove(mem, (char*)p2v(pa), PGSIZE);
-        if(mappages(d, (void*)i, PGSIZE, v2p(mem), flags) < 0)
-            goto bad;
+
+        //writing to file
+        file_size =filewrite(f, (char*)p2v(pa), PGSIZE);
+        //Checking for write errors
+        if (file_size != sizeof(struct proc))
+        { cprintf("Error:Failed to write file.\n"); exit(); }
+        cprintf("Write was successful.\n");
     }
-//    return d;
-
-    file_size =filewrite(f, (char *)proc, sizeof(struct proc))
-
-    //Checking for write error
-    if (file_size != sizeof(struct proc))
-    { cprintf("Error:Failed to write file.\n"); exit(); }
-    cprintf("Write was successful.\n");
     proc->ofile[fd] = 0;
     fileclose(f);
+
+    //context
+    //tf
+    //proc
+
+
     return 0;
 
-    bad:
-    freevm(d);
-    return 0;
 }
 int
 sys_ildpcb(void)

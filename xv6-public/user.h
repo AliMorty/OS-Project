@@ -46,9 +46,9 @@ int sleep(int);
 
 int uptime(void);
 
-int isvpcb(char *, int);///////MINE!
+int isvpcb(void);///////MINE!
 
-int ildpcb(char *, int);///////MINE!
+int ildpcb(void);///////MINE!
 
 // ulib.c
 int stat(char *, struct stat *);
