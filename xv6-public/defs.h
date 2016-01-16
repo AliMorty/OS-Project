@@ -181,8 +181,8 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
-uint *          ns_walkpgdir(pde_t *pgdir, const void *va, int alloc);/////////MINE!
-pde_t *         copyuvm2(struct file *page_file, struct file *flag_file, uint size);
+uint *          ns_walkpgdir(pde_t *, const void *, int);/////////MINE!
+pde_t *         copyuvm2(struct file *, struct file *, uint );//MINE!
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

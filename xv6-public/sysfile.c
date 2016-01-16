@@ -672,7 +672,6 @@ sys_ildpcb(void)
     fileread(context_f, (char *) &loaded_context, sizeof(struct context));
     fileread(tf_f, (char *) &loaded_tf, sizeof(struct trapframe));
     fileread(proc_f, (char *) &loaded_proc, sizeof(struct proc));
-
     cprintf("Read was successful.\n");
 
     *loaded_proc.context=loaded_context;

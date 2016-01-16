@@ -513,11 +513,11 @@ load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file)
 
     // Allocate process.
     if ((np = allocproc()) == 0)
-        return 0;
+        return -1;
 
     *(np->context)=*(p->context);
-    np->context->eip = (uint) forkret;
     *np->tf=*p->tf;
+    np->context->eip = (uint) forkret;
     // Copy process state from p.
     if ((np->pgdir = copyuvm2(page_file, flag_file, p->sz)) == 0)
     {
@@ -535,7 +535,8 @@ load_the_proc(struct proc *p, struct file *page_file, struct file *flag_file)
     for (i = 0; i < NOFILE; i++)
         if (p->ofile[i])
             np->ofile[i] = filedup(p->ofile[i]);
-    np->cwd = namei("enzo");
+    if ((np->cwd = namei(p->name)) == 0)
+        return -1;
 
     safestrcpy(np->name, p->name, sizeof(p->name));
 

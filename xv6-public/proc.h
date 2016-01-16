@@ -10,7 +10,7 @@ struct cpu {
   volatile uint started;       // Has the CPU started?
   int ncli;                    // Depth of pushcli nesting.
   int intena;                  // Were interrupts enabled before pushcli?
-  
+
   // Cpu-local storage variables; see below
   struct cpu *cpu;
   struct proc *proc;           // The currently-running process.
@@ -59,8 +59,8 @@ struct proc {
   enum procstate state;        // Process state
   int pid;                     // Process ID
   struct proc *parent;         // Parent process
-  struct trapframe tf;        // Trap frame for current syscall
-  struct context context;     // swtch() here to run process
+  struct trapframe *tf;        // Trap frame for current syscall
+  struct context *context;     // swtch() here to run process
   void *chan;                  // If non-zero, sleeping on chan
   int killed;                  // If non-zero, have been killed
   struct file *ofile[NOFILE];  // Open files
